@@ -1,11 +1,14 @@
 import streamlit as st
+st.set_page_config(page_title="🌾 Paddy Disease Classifier", layout="centered")
+
 import numpy as np
 import cv2
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 import pandas as pd
-import os
 import gdown
+import os
+
 
 # 🔽 Auto-download model from Google Drive if not present
 model_path = "paddy_model_fusion_final.h5"
