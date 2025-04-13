@@ -4,20 +4,21 @@ import cv2
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 import pandas as pd
-import gdown
 import os
+import gdown
 
+# 🔽 Auto-download model from Google Drive if not present
 model_path = "paddy_model_fusion_final.h5"
-if not os.path.exists(model_path):
-    # ⬇️ Download from your Google Drive (replace FILE_ID below)
-    gdown.download("https://drive.google.com/uc?id=1j1zEA-e8jNm2LDek6K4MpJ56eajQvVIB", model_path, quiet=False)
+drive_file_id = "1j1zEA-e8jNm2LDek6K4MpJ56eajQvVIB"
 
-model = tf.keras.models.load_model(model_path)
+if not os.path.exists(model_path):
+    st.info("Downloading model from Google Drive...")
+    gdown.download(f"https://drive.google.com/uc?id={drive_file_id}", model_path, quiet=False)
 
 # ✅ Load the model
 model = load_model(model_path)
 
-# 🗺️ Class mapping
+# Class map
 class_map = {
     0: "bacterial_leaf_blight",
     1: "bacterial_leaf_streak",
@@ -36,13 +37,9 @@ class_map = {
 
 st.set_page_config(page_title="🌾 Paddy Disease Classifier", layout="centered")
 st.title("🌾 Paddy Disease Detection Dashboard")
-st.markdown("Upload a paddy leaf image and input weather data to detect disease.")
 
-# Weather inputs
 temp = st.number_input("🌡️ Temperature (°C)", 10.0, 50.0, 28.0)
 humidity = st.number_input("💧 Humidity (%)", 10.0, 100.0, 65.0)
-
-# Image upload
 uploaded_file = st.file_uploader("Upload paddy leaf image", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
