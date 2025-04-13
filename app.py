@@ -4,11 +4,20 @@ import cv2
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 import pandas as pd
+import gdown
+import os
 
-# 🔄 Load your trained model
-model = load_model("paddy_model_fusion_final.h5")  # or .keras if you saved it that way
+model_path = "paddy_model_fusion_final.h5"
+if not os.path.exists(model_path):
+    # ⬇️ Download from your Google Drive (replace FILE_ID below)
+    gdown.download("https://drive.google.com/uc?id=1j1zEA-e8jNm2LDek6K4MpJ56eajQvVIB", model_path, quiet=False)
 
-# 🗺️ Class mapping (update if needed)
+model = tf.keras.models.load_model(model_path)
+
+# ✅ Load the model
+model = load_model(model_path)
+
+# 🗺️ Class mapping
 class_map = {
     0: "bacterial_leaf_blight",
     1: "bacterial_leaf_streak",
@@ -44,7 +53,6 @@ if uploaded_file:
     img_input = np.expand_dims(img_resized / 255.0, axis=0)
     weather_input = np.array([[temp, humidity]])
 
-    # Predict
     prediction = model.predict([img_input, weather_input])
     pred_class = np.argmax(prediction)
     confidence = prediction[0][pred_class]
@@ -53,6 +61,5 @@ if uploaded_file:
     st.markdown(f"### 🧠 Prediction: **{class_map[pred_class]}**")
     st.markdown(f"Confidence Score: `{confidence:.2f}`")
 
-    # Confidence bar chart
     df = pd.DataFrame(prediction[0], index=[class_map[i] for i in range(13)], columns=["Confidence"])
     st.bar_chart(df)
